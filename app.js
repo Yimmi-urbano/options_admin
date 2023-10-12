@@ -79,10 +79,10 @@ app.get('/options/:userID', async (req, res) => {
 });
 
 
-app.post('/options/:userID/:menuType', async (req, res) => {
+app.put('/options/:userID/:menuType/:optionID', async (req, res) => {
   try {
-    const { userID, menuType } = req.params;
-    const { optionID, title, estado, icono, url, submenu, orden,componentURL } = req.body;
+    const { userID, menuType, optionID } = req.params;
+    const { title, estado, icono, url, submenu, orden, componentURL } = req.body;
     const menu = await Menu.findOne({ userID });
 
     if (!menu) {
@@ -92,7 +92,7 @@ app.post('/options/:userID/:menuType', async (req, res) => {
     const existingOption = menu.options[menuType].find((o) => o.optionID === optionID);
 
     if (existingOption) {
-
+      // Actualiza los campos del recurso existente
       existingOption.title = title;
       existingOption.estado = estado;
       existingOption.icono = icono;
@@ -101,9 +101,7 @@ app.post('/options/:userID/:menuType', async (req, res) => {
       existingOption.orden = orden;
       existingOption.componentURL = componentURL;
     } else {
-
-      const newOption = { optionID, title, estado, icono, url, submenu, orden,componentURL };
-      menu.options[menuType].push(newOption);
+      return res.status(404).json({ error: 'Opción de menú no encontrada' });
     }
 
     await menu.save();
@@ -114,11 +112,11 @@ app.post('/options/:userID/:menuType', async (req, res) => {
   }
 });
 
-
-app.post('/options/:userID/:menuType/:optionID', async (req, res) => {
+app.put('/options/:userID/:menuType/:optionID', async (req, res) => {
   try {
     const { userID, menuType, optionID } = req.params;
-    const { title, estado, icono, url, submenu, orden, componentURL} = req.body;
+    const { optionID: submenuOptionID, title, estado, icono, url, orden, componentURL } = req.body;
+
     const menu = await Menu.findOne({ userID });
 
     if (!menu) {
@@ -131,14 +129,54 @@ app.post('/options/:userID/:menuType/:optionID', async (req, res) => {
       return res.status(404).json({ error: 'Opción no encontrada' });
     }
 
-    option.submenu.push({ optionID, title, estado, icono, url, submenu, orden, componentURL });
+    if (option.submenu && option.submenu.length > 0) {
+      const submenuEntry = option.submenu.find((sub) => sub.optionID === submenuOptionID);
+
+      if (submenuEntry) {
+        // Si el submenuOptionID existe, actualiza sus propiedades
+        submenuEntry.title = title;
+        submenuEntry.estado = estado;
+        submenuEntry.icono = icono;
+        submenuEntry.url = url;
+        submenuEntry.orden = orden;
+        submenuEntry.componentURL = componentURL;
+      } else {
+        // Si el submenuOptionID no existe, crea un nuevo submenú
+        const newSubmenuEntry = {
+          optionID: submenuOptionID,
+          title,
+          estado,
+          icono,
+          url,
+          orden,
+          componentURL,
+        };
+        option.submenu.push(newSubmenuEntry);
+      }
+    } else {
+      // Si no hay submenú, crea uno nuevo
+      option.submenu = [{
+        optionID: submenuOptionID,
+        title,
+        estado,
+        icono,
+        url,
+        orden,
+        componentURL,
+      }];
+    }
+
     await menu.save();
 
     res.json(menu);
   } catch (error) {
-    res.status(500).json({ error: 'Error al agregar un submenú' });
+    res.status(500).json({ error: 'Error al agregar o actualizar el submenú' });
   }
 });
+
+
+
+
 
 app.listen(port, () => {
   console.log(`API escuchando en el puerto ${port}`);
