@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const app = express();
-const port = 3000;
+//const port = 3000;
 
 mongoose.connect('mongodb+srv://data_user:wY1v50t8fX4lMA85@cluster0.entyyeb.mongodb.net/?retryWrites=true&w=majority', {
   useNewUrlParser: true,
@@ -130,7 +130,7 @@ app.post('/options/:userID/:menuType/:optionID', async (req, res) => {
     res.status(500).json({ error: 'Error al agregar un submenú' });
   }
 });
-
+/*
 app.listen(port, () => {
   console.log(`API escuchando en el puerto ${port}`);
-});
+});*/
