@@ -21,7 +21,8 @@ const submenuSchema = new mongoose.Schema({
   title: String,
   url_page: String,
   icono: String,
-  estado: String
+  estado: String,
+  orden: Number
 });
 
 const optionSchema = new mongoose.Schema({
@@ -30,6 +31,7 @@ const optionSchema = new mongoose.Schema({
   estado: String,
   url_page: String,
   icono: String,
+  orden: Number,
   submenu: [submenuSchema],
 });
 
@@ -76,7 +78,7 @@ app.get('/options/:userID', async (req, res) => {
 app.post('/options/:userID/:menuType', async (req, res) => {
   try {
     const { userID, menuType } = req.params;
-    const { optionID, title, estado,icono,url_page, submenu } = req.body;
+    const { optionID, title, estado, icono, url_page, submenu, orden } = req.body;
     const menu = await Menu.findOne({ userID });
 
     if (!menu) {
@@ -86,15 +88,16 @@ app.post('/options/:userID/:menuType', async (req, res) => {
     const existingOption = menu.options[menuType].find((o) => o.optionID === optionID);
 
     if (existingOption) {
-    
+
       existingOption.title = title;
       existingOption.estado = estado;
       existingOption.icono = icono;
       existingOption.url_page = url_page;
       existingOption.submenu = submenu;
+      existingOption.orden = orden;
     } else {
-   
-      const newOption = { optionID, title, estado ,icono,url_page, submenu };
+
+      const newOption = { optionID, title, estado, icono, url_page, submenu, orden };
       menu.options[menuType].push(newOption);
     }
 
