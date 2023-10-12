@@ -79,10 +79,10 @@ app.get('/options/:userID', async (req, res) => {
 });
 
 
-app.put('/options/:userID/:menuType/:optionID', async (req, res) => {
+app.post('/options/:userID/:menuType', async (req, res) => {
   try {
-    const { userID, menuType, optionID } = req.params;
-    const { title, estado, icono, url, submenu, orden, componentURL } = req.body;
+    const { userID, menuType } = req.params;
+    const { optionID, title, estado, icono, url, submenu, orden, componentURL } = req.body;
     const menu = await Menu.findOne({ userID });
 
     if (!menu) {
@@ -92,16 +92,26 @@ app.put('/options/:userID/:menuType/:optionID', async (req, res) => {
     const existingOption = menu.options[menuType].find((o) => o.optionID === optionID);
 
     if (existingOption) {
-      // Actualiza los campos del recurso existente
-      existingOption.title = title;
-      existingOption.estado = estado;
-      existingOption.icono = icono;
-      existingOption.url = url;
-      existingOption.submenu = submenu;
-      existingOption.orden = orden;
-      existingOption.componentURL = componentURL;
+      // Actualiza solo los campos proporcionados en la solicitud
+      if (title !== undefined) existingOption.title = title;
+      if (estado !== undefined) existingOption.estado = estado;
+      if (icono !== undefined) existingOption.icono = icono;
+      if (url !== undefined) existingOption.url = url;
+      if (submenu !== undefined) existingOption.submenu = submenu;
+      if (orden !== undefined) existingOption.orden = orden;
+      if (componentURL !== undefined) existingOption.componentURL = componentURL;
     } else {
-      return res.status(404).json({ error: 'Opción de menú no encontrada' });
+      const newOption = {
+        optionID,
+        title,
+        estado,
+        icono,
+        url,
+        submenu,
+        orden,
+        componentURL,
+      };
+      menu.options[menuType].push(newOption);
     }
 
     await menu.save();
