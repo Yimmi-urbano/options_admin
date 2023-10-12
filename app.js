@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -47,6 +48,7 @@ const menuSchema = new mongoose.Schema({
 const Menu = mongoose.model('Menu', menuSchema);
 
 app.use(express.json());
+app.use(cors());
 
 app.post('/options', async (req, res) => {
   try {
