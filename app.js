@@ -118,7 +118,7 @@ app.post('/options/:userID/:menuType', async (req, res) => {
 app.post('/options/:userID/:menuType/:optionID', async (req, res) => {
   try {
     const { userID, menuType, optionID } = req.params;
-    const { title, estado } = req.body;
+    const { title, estado, icono, url, submenu, orden, componentURL} = req.body;
     const menu = await Menu.findOne({ userID });
 
     if (!menu) {
@@ -131,7 +131,7 @@ app.post('/options/:userID/:menuType/:optionID', async (req, res) => {
       return res.status(404).json({ error: 'Opción no encontrada' });
     }
 
-    option.submenu.push({ title, estado });
+    option.submenu.push({ optionID, title, estado, icono, url, submenu, orden, componentURL });
     await menu.save();
 
     res.json(menu);
