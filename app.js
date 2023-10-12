@@ -20,7 +20,7 @@ db.once('open', () => {
 const submenuSchema = new mongoose.Schema({
   optionID: String,
   title: String,
-  url_page: String,
+  url: String,
   componentURL: String,
   icono: String,
   estado: String,
@@ -31,7 +31,7 @@ const optionSchema = new mongoose.Schema({
   optionID: String,
   title: String,
   estado: String,
-  url_page: String,
+  url: String,
   componentURL: String,
   icono: String,
   orden: Number,
@@ -96,13 +96,13 @@ app.post('/options/:userID/:menuType', async (req, res) => {
       existingOption.title = title;
       existingOption.estado = estado;
       existingOption.icono = icono;
-      existingOption.url_page = url_page;
+      existingOption.url = url;
       existingOption.submenu = submenu;
       existingOption.orden = orden;
       existingOption.componentURL = componentURL;
     } else {
 
-      const newOption = { optionID, title, estado, icono, url_page, submenu, orden,componentURL };
+      const newOption = { optionID, title, estado, icono, url, submenu, orden,componentURL };
       menu.options[menuType].push(newOption);
     }
 
