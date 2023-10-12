@@ -82,7 +82,7 @@ app.get('/options/:userID', async (req, res) => {
 app.post('/options/:userID/:menuType', async (req, res) => {
   try {
     const { userID, menuType } = req.params;
-    const { optionID, title, estado, icono, url_page, submenu, orden,componentURL } = req.body;
+    const { optionID, title, estado, icono, url, submenu, orden,componentURL } = req.body;
     const menu = await Menu.findOne({ userID });
 
     if (!menu) {
