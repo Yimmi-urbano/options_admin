@@ -144,12 +144,14 @@ app.put('/options/:userID/:menuType/:optionID', async (req, res) => {
 
       if (submenuEntry) {
         // Si el submenuOptionID existe, actualiza sus propiedades
+        submenuEntry.optionID= submenuOptionID;
         submenuEntry.title = title;
         submenuEntry.estado = estado;
         submenuEntry.icono = icono;
         submenuEntry.url = url;
         submenuEntry.orden = orden;
         submenuEntry.componentURL = componentURL;
+       
       } else {
         // Si el submenuOptionID no existe, crea un nuevo submenú
         const newSubmenuEntry = {
