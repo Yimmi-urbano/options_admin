@@ -5,7 +5,6 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
 
-
 mongoose.connect('mongodb+srv://data_user:wY1v50t8fX4lMA85@cluster0.entyyeb.mongodb.net/?retryWrites=true&w=majority', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -40,10 +39,12 @@ const optionSchema = new mongoose.Schema({
 
 const menuSchema = new mongoose.Schema({
   userID: String,
-  company: String,
+  companyType: String,
+  companyID: String,
+  domain: String,
   options: {
     menu_panel: [optionSchema],
-    menu_footer: [optionSchema],
+    menu_footer: [optionSchema]
   },
 });
 
@@ -54,8 +55,8 @@ app.use(cors());
 
 app.post('/options', async (req, res) => {
   try {
-    const { userID, company, options } = req.body;
-    const menu = new Menu({ userID, company, options });
+    const { userID, company, options, companyID, domain } = req.body;
+    const menu = new Menu({ userID, company, options, companyID, domain });
     await menu.save();
     res.json(menu);
   } catch (error) {
@@ -92,7 +93,7 @@ app.post('/options/:userID/:menuType', async (req, res) => {
     const existingOption = menu.options[menuType].find((o) => o.optionID === optionID);
 
     if (existingOption) {
-      // Actualiza solo los campos proporcionados en la solicitud
+
       if (title !== undefined) existingOption.title = title;
       if (estado !== undefined) existingOption.estado = estado;
       if (icono !== undefined) existingOption.icono = icono;
@@ -143,17 +144,17 @@ app.put('/options/:userID/:menuType/:optionID', async (req, res) => {
       const submenuEntry = option.submenu.find((sub) => sub.optionID === submenuOptionID);
 
       if (submenuEntry) {
-        // Si el submenuOptionID existe, actualiza sus propiedades
-        submenuEntry.optionID= submenuOptionID;
+
+        submenuEntry.optionID = submenuOptionID;
         submenuEntry.title = title;
         submenuEntry.estado = estado;
         submenuEntry.icono = icono;
         submenuEntry.url = url;
         submenuEntry.orden = orden;
         submenuEntry.componentURL = componentURL;
-       
+
       } else {
-        // Si el submenuOptionID no existe, crea un nuevo submenú
+
         const newSubmenuEntry = {
           optionID: submenuOptionID,
           title,
@@ -166,7 +167,7 @@ app.put('/options/:userID/:menuType/:optionID', async (req, res) => {
         option.submenu.push(newSubmenuEntry);
       }
     } else {
-      // Si no hay submenú, crea uno nuevo
+
       option.submenu = [{
         optionID: submenuOptionID,
         title,
@@ -185,10 +186,6 @@ app.put('/options/:userID/:menuType/:optionID', async (req, res) => {
     res.status(500).json({ error: 'Error al agregar o actualizar el submenú' });
   }
 });
-
-
-
-
 
 app.listen(port, () => {
   console.log(`API escuchando en el puerto ${port}`);
