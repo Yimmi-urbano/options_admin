@@ -56,6 +56,10 @@ app.use(cors());
 app.post('/options', async (req, res) => {
   try {
     const { userID, company, options, companyID, domain } = req.body;
+    const existingMenu = await Menu.findOne({ userID });
+    if (existingMenu) {
+      return res.status(400).json({ error: 'El userID ya existe en la colección' });
+    }
     const menu = new Menu({ userID, company, options, companyID, domain });
     await menu.save();
     res.json(menu);
@@ -63,6 +67,7 @@ app.post('/options', async (req, res) => {
     res.status(500).json({ error: 'Error al crear la opción del menú' });
   }
 });
+
 
 app.get('/options/:userID', async (req, res) => {
   try {
