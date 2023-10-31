@@ -38,10 +38,7 @@ const optionSchema = new mongoose.Schema({
 });
 
 const menuSchema = new mongoose.Schema({
-  userID: String,
-  companyType: String,
   storeId: String,
-  domain: String,
   options: {
     menu_panel: [optionSchema],
     menu_footer: [optionSchema]
@@ -55,12 +52,12 @@ app.use(cors());
 
 app.post('/options', async (req, res) => {
   try {
-    const { userID, company, options, companyID, domain } = req.body;
-    const existingMenu = await Menu.findOne({ userID });
+    const { storeId, company, options, companyID, domain } = req.body;
+    const existingMenu = await Menu.findOne({ storeId });
     if (existingMenu) {
-      return res.status(400).json({ error: 'El userID ya existe en la colección' });
+      return res.status(400).json({ error: 'El storeId ya existe en la colección' });
     }
-    const menu = new Menu({ userID, company, options, companyID, domain });
+    const menu = new Menu({ storeId, options });
     await menu.save();
     res.json(menu);
   } catch (error) {
@@ -69,13 +66,13 @@ app.post('/options', async (req, res) => {
 });
 
 
-app.get('/options/:userID', async (req, res) => {
+app.get('/options/:storeId', async (req, res) => {
   try {
-    const { userID } = req.params;
-    const menu = await Menu.findOne({ userID });
+    const { storeId } = req.params;
+    const menu = await Menu.findOne({ storeId });
 
     if (!menu) {
-      return res.status(404).json({ error: 'Usuario no encontrado' });
+      return res.status(404).json({ error: 'Store no encontrado' });
     }
 
     res.json(menu.options);
@@ -85,11 +82,11 @@ app.get('/options/:userID', async (req, res) => {
 });
 
 
-app.post('/options/:userID/:menuType', async (req, res) => {
+app.post('/options/:storeId/:menuType', async (req, res) => {
   try {
-    const { userID, menuType } = req.params;
+    const { storeId, menuType } = req.params;
     const { optionID, title, estado, icono, url, submenu, orden, componentURL } = req.body;
-    const menu = await Menu.findOne({ userID });
+    const menu = await Menu.findOne({ storeId });
 
     if (!menu) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -128,12 +125,12 @@ app.post('/options/:userID/:menuType', async (req, res) => {
   }
 });
 
-app.put('/options/:userID/:menuType/:optionID', async (req, res) => {
+app.put('/options/:storeId/:menuType/:optionID', async (req, res) => {
   try {
-    const { userID, menuType, optionID } = req.params;
+    const { storeId, menuType, optionID } = req.params;
     const { optionID: submenuOptionID, title, estado, icono, url, orden, componentURL } = req.body;
 
-    const menu = await Menu.findOne({ userID });
+    const menu = await Menu.findOne({ storeId });
 
     if (!menu) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
