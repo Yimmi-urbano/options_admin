@@ -40,7 +40,7 @@ const optionSchema = new mongoose.Schema({
 const menuSchema = new mongoose.Schema({
   userID: String,
   companyType: String,
-  companyID: String,
+  storeId: String,
   domain: String,
   options: {
     menu_panel: [optionSchema],
